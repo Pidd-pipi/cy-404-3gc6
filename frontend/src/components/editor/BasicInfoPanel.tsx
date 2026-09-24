@@ -11,7 +11,7 @@ const inputClass =
 
 export function BasicInfoPanel({ value, onChange }: BasicInfoPanelProps) {
   return (
-    <section className="border border-[var(--border)] bg-[var(--surface)] p-4">
+    <section className="border border-[var(--border)] bg-[var(--surface)] p-4" id="basic-info-panel">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="font-display text-xl font-semibold">基本信息</h2>

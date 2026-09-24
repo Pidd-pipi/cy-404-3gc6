@@ -3,14 +3,18 @@ import { Link, useParams } from 'react-router-dom';
 import { Download, LayoutTemplate, UserRound } from 'lucide-react';
 import { BasicInfoPanel } from '../components/editor/BasicInfoPanel';
 import { ModuleSidebar } from '../components/editor/ModuleSidebar';
+import { SelfCheckPanel } from '../components/editor/SelfCheckPanel';
 import { Button } from '../components/common/Button';
 import { EmptyState } from '../components/common/EmptyState';
 import { SectionEditor } from '../components/common/SectionEditor';
 import { ResumePreview } from '../components/preview/ResumePreview';
 import { useProfileStore } from '../stores/profile';
 import { useResumeStore } from '../stores/resume';
+import { useSelfCheckStore } from '../stores/selfCheck';
 import { templates } from '../stores/template';
 import { ResumeSection, ResumeSectionType } from '../types/resume';
+import { SelfCheckIssue } from '../types/self-check';
+import { isSelfCheckStale, runSelfCheck } from '../utils/selfCheck';
 
 export function ResumeEditor() {
   const { id } = useParams();
@@ -22,6 +26,8 @@ export function ResumeEditor() {
   const toggleSection = useResumeStore((state) => state.toggleSection);
   const setActiveResume = useResumeStore((state) => state.setActiveResume);
   const profile = useProfileStore((state) => state.profile);
+  const selfCheckReport = useSelfCheckStore((state) => (id ? state.reports[id] ?? null : null));
+  const saveSelfCheckReport = useSelfCheckStore((state) => state.saveReport);
   const resume = useMemo(() => resumes.find((item) => item.id === id), [id, resumes]);
 
   if (!resume) {
@@ -59,6 +65,21 @@ export function ResumeEditor() {
       avatarUrl: profile.avatarUrl,
     });
     updateResume(resume.id, { summary: profile.summary });
+  };
+
+  const selfCheckStale = selfCheckReport ? isSelfCheckStale(selfCheckReport, resume) : false;
+
+  const runCheck = () => {
+    saveSelfCheckReport(runSelfCheck(resume, profile));
+  };
+
+  const jumpToIssue = (issue: SelfCheckIssue) => {
+    if (issue.module === 'basic') {
+      document.getElementById('basic-info-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+    setActiveSectionId(issue.module);
+    document.getElementById('section-editor')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   return (
@@ -114,8 +135,11 @@ export function ResumeEditor() {
           sections={resume.sections}
         />
         <div className="space-y-5">
+          <SelfCheckPanel report={selfCheckReport} stale={selfCheckStale} onJump={jumpToIssue} onRun={runCheck} />
           <BasicInfoPanel value={resume.basicInfo} onChange={(patch) => updateBasicInfo(resume.id, patch)} />
-          <SectionEditor resume={resume} sectionId={activeSectionId} onChange={(patch) => updateResume(resume.id, patch)} />
+          <div id="section-editor">
+            <SectionEditor resume={resume} sectionId={activeSectionId} onChange={(patch) => updateResume(resume.id, patch)} />
+          </div>
         </div>
         <aside className="max-h-[calc(100vh-140px)] overflow-auto border border-[var(--border)] bg-[var(--surface-alt)] p-4">
           <ResumePreview resume={resume} fontSize={10} />
