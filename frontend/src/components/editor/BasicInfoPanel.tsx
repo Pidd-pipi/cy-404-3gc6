@@ -1,5 +1,6 @@
 import { AvatarUploader } from '../common/AvatarUploader';
 import { ResumeBasicInfo } from '../../types/resume';
+import { checkTargetIds } from '../../utils/resume-check';
 
 interface BasicInfoPanelProps {
   value: ResumeBasicInfo;
@@ -22,7 +23,12 @@ export function BasicInfoPanel({ value, onChange }: BasicInfoPanelProps) {
       <div className="mt-5 grid gap-3 md:grid-cols-2">
         <label className="space-y-1 text-sm font-medium">
           <span>姓名</span>
-          <input className={inputClass} value={value.fullName} onChange={(event) => onChange({ fullName: event.target.value })} />
+          <input
+            className={inputClass}
+            id={checkTargetIds.basicField('fullName')}
+            value={value.fullName}
+            onChange={(event) => onChange({ fullName: event.target.value })}
+          />
         </label>
         <label className="space-y-1 text-sm font-medium">
           <span>标题</span>
@@ -30,11 +36,22 @@ export function BasicInfoPanel({ value, onChange }: BasicInfoPanelProps) {
         </label>
         <label className="space-y-1 text-sm font-medium">
           <span>电话</span>
-          <input className={inputClass} value={value.phone} onChange={(event) => onChange({ phone: event.target.value })} />
+          <input
+            className={inputClass}
+            id={checkTargetIds.basicField('phone')}
+            value={value.phone}
+            onChange={(event) => onChange({ phone: event.target.value })}
+          />
         </label>
         <label className="space-y-1 text-sm font-medium">
           <span>邮箱</span>
-          <input className={inputClass} type="email" value={value.email} onChange={(event) => onChange({ email: event.target.value })} />
+          <input
+            className={inputClass}
+            id={checkTargetIds.basicField('email')}
+            type="email"
+            value={value.email}
+            onChange={(event) => onChange({ email: event.target.value })}
+          />
         </label>
         <label className="space-y-1 text-sm font-medium">
           <span>城市</span>

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Download, LayoutTemplate, UserRound } from 'lucide-react';
 import { BasicInfoPanel } from '../components/editor/BasicInfoPanel';
+import { CheckPanel } from '../components/editor/CheckPanel';
 import { ModuleSidebar } from '../components/editor/ModuleSidebar';
 import { Button } from '../components/common/Button';
 import { EmptyState } from '../components/common/EmptyState';
@@ -11,6 +12,7 @@ import { useProfileStore } from '../stores/profile';
 import { useResumeStore } from '../stores/resume';
 import { templates } from '../stores/template';
 import { ResumeSection, ResumeSectionType } from '../types/resume';
+import { CheckIssue } from '../utils/resume-check';
 
 export function ResumeEditor() {
   const { id } = useParams();
@@ -59,6 +61,21 @@ export function ResumeEditor() {
       avatarUrl: profile.avatarUrl,
     });
     updateResume(resume.id, { summary: profile.summary });
+  };
+
+  const handleJumpToIssue = (issue: CheckIssue) => {
+    if (issue.module !== 'basic') {
+      setActiveSectionId(issue.module);
+    }
+    // 等切换模块后的编辑区渲染完成，再滚动并聚焦到问题位置
+    window.setTimeout(() => {
+      const target = document.getElementById(issue.targetId);
+      if (!target) {
+        return;
+      }
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      target.focus({ preventScroll: true });
+    }, 80);
   };
 
   return (
@@ -114,6 +131,7 @@ export function ResumeEditor() {
           sections={resume.sections}
         />
         <div className="space-y-5">
+          <CheckPanel resume={resume} onJumpToIssue={handleJumpToIssue} />
           <BasicInfoPanel value={resume.basicInfo} onChange={(patch) => updateBasicInfo(resume.id, patch)} />
           <SectionEditor resume={resume} sectionId={activeSectionId} onChange={(patch) => updateResume(resume.id, patch)} />
         </div>

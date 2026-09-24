@@ -2,6 +2,7 @@ import { Plus, Trash2 } from 'lucide-react';
 import { EducationLevel, educationLevelLabels, SkillCategory, SkillLevel, skillCategoryLabels, skillLevelLabels, SkillProficiency } from '../../types/enums';
 import { Resume, ResumeSectionType } from '../../types/resume';
 import { createId, fromLines, toLines } from '../../utils/format';
+import { checkTargetIds } from '../../utils/resume-check';
 import { Button } from './Button';
 
 interface SectionEditorProps {
@@ -14,6 +15,7 @@ const inputClass =
   'w-full rounded-md border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--ink)] placeholder:text-[var(--muted)]';
 const textareaClass = `${inputClass} min-h-24 resize-y leading-6`;
 const blockClass = 'border border-[var(--border)] bg-[var(--surface)] p-4';
+const focusableBlockClass = 'focus:outline-none focus:ring-2 focus:ring-[var(--accent)]';
 
 function sectionTitle(resume: Resume, sectionId: ResumeSectionType) {
   return resume.sections.find((section) => section.id === sectionId)?.title ?? '模块';
@@ -26,7 +28,12 @@ export function SectionEditor({ resume, sectionId, onChange }: SectionEditorProp
         <h2 className="font-display text-2xl font-semibold">{sectionTitle(resume, sectionId)}</h2>
         <label className="mt-5 block space-y-2 text-sm font-medium">
           <span>职业摘要</span>
-          <textarea className={textareaClass} value={resume.summary} onChange={(event) => onChange({ summary: event.target.value })} />
+          <textarea
+            className={textareaClass}
+            id={checkTargetIds.summary}
+            value={resume.summary}
+            onChange={(event) => onChange({ summary: event.target.value })}
+          />
         </label>
       </section>
     );
@@ -61,7 +68,12 @@ export function SectionEditor({ resume, sectionId, onChange }: SectionEditorProp
         </div>
         <div className="mt-5 space-y-4">
           {resume.workExperiences.map((item) => (
-            <div className="border border-[var(--border)] bg-[var(--bg)] p-4" key={item.id}>
+            <div
+              className={`border border-[var(--border)] bg-[var(--bg)] p-4 ${focusableBlockClass}`}
+              id={checkTargetIds.work(item.id)}
+              key={item.id}
+              tabIndex={-1}
+            >
               <div className="grid gap-3 md:grid-cols-2">
                 <input
                   className={inputClass}
@@ -189,7 +201,12 @@ export function SectionEditor({ resume, sectionId, onChange }: SectionEditorProp
         </div>
         <div className="mt-5 space-y-4">
           {resume.educations.map((item) => (
-            <div className="border border-[var(--border)] bg-[var(--bg)] p-4" key={item.id}>
+            <div
+              className={`border border-[var(--border)] bg-[var(--bg)] p-4 ${focusableBlockClass}`}
+              id={checkTargetIds.education(item.id)}
+              key={item.id}
+              tabIndex={-1}
+            >
               <div className="grid gap-3 md:grid-cols-2">
                 <input
                   className={inputClass}
@@ -329,7 +346,12 @@ export function SectionEditor({ resume, sectionId, onChange }: SectionEditorProp
         </div>
         <div className="mt-5 space-y-3">
           {resume.skills.map((item) => (
-            <div className="grid gap-3 border border-[var(--border)] bg-[var(--bg)] p-3 md:grid-cols-[1.2fr_1fr_1fr_0.8fr_auto]" key={item.id}>
+            <div
+              className={`grid gap-3 border border-[var(--border)] bg-[var(--bg)] p-3 md:grid-cols-[1.2fr_1fr_1fr_0.8fr_auto] ${focusableBlockClass}`}
+              id={checkTargetIds.skill(item.id)}
+              key={item.id}
+              tabIndex={-1}
+            >
               <input
                 className={inputClass}
                 value={item.name}
@@ -441,7 +463,12 @@ export function SectionEditor({ resume, sectionId, onChange }: SectionEditorProp
       </div>
       <div className="mt-5 space-y-4">
         {resume.projects.map((item) => (
-          <div className="border border-[var(--border)] bg-[var(--bg)] p-4" key={item.id}>
+          <div
+            className={`border border-[var(--border)] bg-[var(--bg)] p-4 ${focusableBlockClass}`}
+            id={checkTargetIds.project(item.id)}
+            key={item.id}
+            tabIndex={-1}
+          >
             <div className="grid gap-3 md:grid-cols-2">
               <input
                 className={inputClass}
